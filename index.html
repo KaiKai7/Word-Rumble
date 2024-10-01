@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrambled Word Game</title>
+    <title>Scrambled Word Game with Random Statement</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +12,7 @@
 
         #grid {
             display: grid;
-            grid-template-columns: repeat(6, 50px); /* Adjust grid size as necessary */
+            grid-template-columns: repeat(6, 50px);
             gap: 10px;
             justify-content: center;
             margin-bottom: 20px;
@@ -46,23 +46,90 @@
             font-weight: bold;
             margin-bottom: 20px;
         }
+
+        /* Overlay styling */
+        #overlay {
+            display: none; /* Initially hidden */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            z-index: 9999;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #overlay div {
+            display: none; /* Ensure the content is hidden */
+        }
+
+        #overlay.show {
+            display: flex; /* Show overlay when triggered */
+        }
+
+        #overlay.show div {
+            display: block; /* Show message and close button when overlay is active */
+        }
+
+        #closeBtn {
+            font-size: 24px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Green button */
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h1>Word Rumble</h1>
     <!-- Hint section to display the category of words -->
-    <div id="hint"></div>
+    <div id="hint">Hint: The category is Canadian Provinces</div>
 
     <div id="grid"></div>
     <div id="wordInputs"></div>
     <button id="submitBtn">Check Words</button>
     <div id="message"></div>
 
-    <script>
-        // The category of the words as a hint
-        const category = "Canadian Provinces";
+    <!-- Overlay for congratulations message -->
+    <div id="overlay">
+        <div>
+            <p id="overlayMessage"></p>
+            <button id="closeBtn" onclick="hideOverlay()">Close</button>
+        </div>
+    </div>
 
-        // The 5 correct words related to the category
+    <script>
+        // Random statement generator
+        const nouns = [
+            'Pre-Schoolers', 'Ken Jennings', 'Nostradamus', 'Butterflies', 'Windows 95 Computers', 
+            'Hamsters', 'Sled Dogs', 'Redwood Trees', 'Stephen Hawkings', 'Bill Nyes', 'Rudy Giulianis'
+        ];
+
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 100) + 1; // Generates a number between 1 and 100
+        }
+
+        function getRandomNoun() {
+            const randomIndex = Math.floor(Math.random() * nouns.length);
+            return nouns[randomIndex];
+        }
+
+        function generateRandomStatement() {
+            const randomNumber = getRandomNumber();
+            const randomNoun = getRandomNoun();
+            return `Congratulations! You are as smart as ${randomNumber} ${randomNoun}.`;
+        }
+
+        // Scrambled word game logic
+        const category = "Canadian Provinces";
         const words = ["yukon", "alberta", "manitoba", "ontario", "quebec"];
 
         // Display the category hint
@@ -91,7 +158,7 @@
             words.forEach(() => {
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.maxLength = 10; // Set max length to allow for longer words
+                input.maxLength = 10;
                 input.className = 'word-input';
                 wordInputsDiv.appendChild(input);
             });
@@ -106,16 +173,31 @@
             enteredWords.forEach((word, index) => {
                 if (words.includes(word)) {
                     inputs[index].classList.add('correct');
-                    inputs[index].disabled = true; // Lock the correct word
+                    inputs[index].disabled = true;
                 } else {
                     allCorrect = false;
                 }
             });
 
-            // Check if all unique correct words are found
+            // If all words are correct, show the random statement in the overlay
             if (new Set(enteredWords.filter(word => words.includes(word))).size === words.length) {
-                document.getElementById('message').textContent = "Congratulations! You've completed the puzzle!";
+                const randomStatement = generateRandomStatement();
+                showOverlay(randomStatement);
             }
+        }
+
+        // Function to show the overlay with the random statement
+        function showOverlay(statement) {
+            const overlay = document.getElementById('overlay');
+            const overlayMessage = document.getElementById('overlayMessage');
+            overlayMessage.textContent = statement;
+            overlay.classList.add('show'); // Show overlay
+        }
+
+        // Function to hide the overlay
+        function hideOverlay() {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.remove('show'); // Hide overlay
         }
 
         // Initialize the game
