@@ -107,33 +107,38 @@
     </div>
 
     <script>
-        // Random statement generator
-        const nouns = [
-            'Pre-Schoolers', 'Ken Jennings', 'Nostradamus', 'Butterflies', 'Windows 95 Computers', 
-            'Hamsters', 'Sled Dogs', 'Redwood Trees', 'Stephen Hawkings', 'Bill Nyes', 'Rudy Giulianis'
+        // Store the puzzles for the week in an array
+        const puzzles = [
+            { date: "2024-10-01", category: "Canadian Provinces", words: ["yukon", "alberta", "manitoba", "ontario", "quebec"] },
+            { date: "2024-10-02", category: "Fruits", words: ["apple", "banana", "cherry", "date", "elderberry"] },
+            { date: "2024-10-03", category: "US States", words: ["california", "texas", "florida", "newyork", "ohio"] },
+            { date: "2024-10-04", category: "Planets", words: ["mercury", "venus", "earth", "mars", "jupiter"] },
+            { date: "2024-10-05", category: "Colors", words: ["red", "blue", "green", "yellow", "purple"] },
+            { date: "2024-10-06", category: "Animals", words: ["cat", "dog", "elephant", "giraffe", "horse"] },
+            { date: "2024-10-07", category: "Birds", words: ["sparrow", "eagle", "owl", "parrot", "pigeon"] }
         ];
 
-        function getRandomNumber() {
-            return Math.floor(Math.random() * 100) + 1; // Generates a number between 1 and 100
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+
+        // Find the puzzle for today
+        const todayPuzzle = puzzles.find(p => p.date === today);
+
+        // Function to display today's puzzle
+        function displayPuzzle(puzzle) {
+            if (puzzle) {
+                // Display the category hint
+                document.getElementById('hint').textContent = "Hint: The category is " + puzzle.category;
+
+                // Scramble the letters and place them in a grid
+                createScrambledGrid(puzzle.words);
+
+                // Create input fields for the user to guess the words
+                createWordInputs(puzzle.words);
+            } else {
+                document.getElementById('hint').textContent = "No puzzle available for today.";
+            }
         }
-
-        function getRandomNoun() {
-            const randomIndex = Math.floor(Math.random() * nouns.length);
-            return nouns[randomIndex];
-        }
-
-        function generateRandomStatement() {
-            const randomNumber = getRandomNumber();
-            const randomNoun = getRandomNoun();
-            return `Congratulations! You are as smart as ${randomNumber} ${randomNoun}.`;
-        }
-
-        // Scrambled word game logic
-        const category = "Canadian Provinces";
-        const words = ["yukon", "alberta", "manitoba", "ontario", "quebec"];
-
-        // Display the category hint
-        document.getElementById('hint').textContent = "Hint: The category is " + category;
 
         // Scramble the letters and place them in a grid
         function shuffleArray(array) {
@@ -143,7 +148,7 @@
         function createScrambledGrid(words) {
             let allLetters = words.join("").split("");
             let scrambledLetters = shuffleArray(allLetters);
-            
+
             const grid = document.getElementById('grid');
             scrambledLetters.forEach(letter => {
                 const letterBox = document.createElement('div');
@@ -171,7 +176,7 @@
 
             // Check entered words against the list of correct words
             enteredWords.forEach((word, index) => {
-                if (words.includes(word)) {
+                if (todayPuzzle.words.includes(word)) {
                     inputs[index].classList.add('correct');
                     inputs[index].disabled = true;
                 } else {
@@ -180,10 +185,31 @@
             });
 
             // If all words are correct, show the random statement in the overlay
-            if (new Set(enteredWords.filter(word => words.includes(word))).size === words.length) {
+            if (new Set(enteredWords.filter(word => todayPuzzle.words.includes(word))).size === todayPuzzle.words.length) {
                 const randomStatement = generateRandomStatement();
                 showOverlay(randomStatement);
             }
+        }
+
+        // Random statement generator
+        const nouns = [
+            'Pre-Schoolers', 'Ken Jennings', 'Nostradamus', 'Butterflies', 'Windows 95 Computers', 
+            'Hamsters', 'Sled Dogs', 'Redwood Trees', 'Stephen Hawkings', 'Bill Nyes', 'Rudy Giulianis'
+        ];
+
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 100) + 1; // Generates a number between 1 and 100
+        }
+
+        function getRandomNoun() {
+            const randomIndex = Math.floor(Math.random() * nouns.length);
+            return nouns[randomIndex];
+        }
+
+        function generateRandomStatement() {
+            const randomNumber = getRandomNumber();
+            const randomNoun = getRandomNoun();
+            return `Congratulations! You are as smart as ${randomNumber} ${randomNoun}.`;
         }
 
         // Function to show the overlay with the random statement
@@ -200,9 +226,8 @@
             overlay.classList.remove('show'); // Hide overlay
         }
 
-        // Initialize the game
-        createScrambledGrid(words);
-        createWordInputs(words);
+        // Initialize the game with today's puzzle
+        displayPuzzle(todayPuzzle);
 
         // Add event listener to check words when the button is clicked
         document.getElementById('submitBtn').addEventListener('click', checkWords);
