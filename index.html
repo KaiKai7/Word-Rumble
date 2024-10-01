@@ -171,7 +171,7 @@
 
         function checkWords() {
             const inputs = document.querySelectorAll('.word-input');
-            const enteredWords = Array.from(inputs).map(input => input.value.toLowerCase());
+            const enteredWords = Array.from(inputs).map(input => input.value.trim().toLowerCase());
             let allCorrect = true;
 
             // Check entered words against the list of correct words
