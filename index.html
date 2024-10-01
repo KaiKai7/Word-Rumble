@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrambled Word Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(6, 50px); /* Adjust grid size as necessary */
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .letter {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            border: 1px solid #000;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        #wordInputs {
+            margin-bottom: 20px;
+        }
+
+        .word-input {
+            margin: 5px 0;
+            font-size: 20px;
+        }
+
+        .correct {
+            background-color: lightgreen;
+            pointer-events: none; /* Prevent further editing */
+        }
+
+        #hint {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Word Rumble</h1>
+    <!-- Hint section to display the category of words -->
+    <div id="hint"></div>
+
+    <div id="grid"></div>
+    <div id="wordInputs"></div>
+    <button id="submitBtn">Check Words</button>
+    <div id="message"></div>
+
+    <script>
+        // The category of the words as a hint
+        const category = "Fruits";
+
+        // The 5 correct words related to the category
+        const words = ["apple", "grape", "peach", "berry", "lemon"];
+
+        // Display the category hint
+        document.getElementById('hint').textContent = "Hint: The category is " + category;
+
+        // Scramble the letters and place them in a grid
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function createScrambledGrid(words) {
+            let allLetters = words.join("").split("");
+            let scrambledLetters = shuffleArray(allLetters);
+            
+            const grid = document.getElementById('grid');
+            scrambledLetters.forEach(letter => {
+                const letterBox = document.createElement('div');
+                letterBox.className = 'letter';
+                letterBox.textContent = letter;
+                grid.appendChild(letterBox);
+            });
+        }
+
+        function createWordInputs(words) {
+            const wordInputsDiv = document.getElementById('wordInputs');
+            words.forEach(() => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 10; // Set max length to allow for longer words
+                input.className = 'word-input';
+                wordInputsDiv.appendChild(input);
+            });
+        }
+
+        function checkWords() {
+            const inputs = document.querySelectorAll('.word-input');
+            const enteredWords = Array.from(inputs).map(input => input.value.toLowerCase());
+            let allCorrect = true;
+
+            // Check entered words against the list of correct words
+            enteredWords.forEach((word, index) => {
+                if (words.includes(word)) {
+                    inputs[index].classList.add('correct');
+                    inputs[index].disabled = true; // Lock the correct word
+                } else {
+                    allCorrect = false;
+                }
+            });
+
+            // Check if all unique correct words are found
+            if (new Set(enteredWords.filter(word => words.includes(word))).size === words.length) {
+                document.getElementById('message').textContent = "Congratulations! You've completed the puzzle!";
+            }
+        }
+
+        // Initialize the game
+        createScrambledGrid(words);
+        createWordInputs(words);
+
+        // Add event listener to check words when the button is clicked
+        document.getElementById('submitBtn').addEventListener('click', checkWords);
+    </script>
+</body>
+</html>
